@@ -4,39 +4,39 @@ module.exports = function(grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         jshint: {
-            gc: ['Gruntfile.js', 'js/ol3-osm-map.js']
+            "ol3-osm-app": ['Gruntfile.js', 'js/ol3-osm-app.js']
         },
         uglify: {
             options: {
             },
-            gc_tmp: {
+            "ol3-osm-app_tmp": {
                 files: {
-                    'tmp/ol3-osm-map.min.js': ['js/jquery.js', 'js/jquery-ui-1.10.3.custom.js', 'js/ol3-osm-map.js']
+                    'tmp/ol3-osm-app.min.js': ['js/jquery.js', 'js/jquery-ui-1.10.3.custom.js', 'js/ol3-osm-app.js']
                 }
             },
-            gc: {
+            "ol3-osm-app": {
                 options: {
                     banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n',
                     compress: false
                 },
                 files: {
-                    'build/ol3-osm-map.min.js': ['js/ol-simple.js', 'tmp/ol3-osm-map.min.js']
+                    'build/ol3-osm-app.min.js': ['js/ol-simple.js', 'tmp/ol3-osm-app.min.js']
                 }
             }
         },
         csslint: {
-            gc: {
+            "ol3-osm-app": {
                 options: {
                     "box-model": false,
                     'adjoining-classes': false
                 },
-                src: ['css/ol3-osm-map.css']
+                src: ['css/ol3-osm-app.css']
             }
         },
         cssmin: {
-            combine: {
+            "ol3-osm-app": {
                 files: {
-                    'build/ol3-osm-map.css': ['css/jquery-ui-1.10.3.custom.min.css', 'css/ol.css', 'css/ol3-osm-map.css']
+                    'build/ol3-osm-app.css': ['css/jquery-ui-1.10.3.custom.min.css', 'css/ol.css', 'css/ol3-osm-app.css']
                 }
             }
         }

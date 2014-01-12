@@ -1,0 +1,20 @@
+{
+  "name": "ol3-osm-map",
+  "version": "",
+  "description": "OSM web application",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/sbrunner/ol3-osm-map.git"
+  },
+  "license": "BSD",
+  "bugs": {
+    "url": "https://github.com/sbrunner/ol3-osm-map/issues"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-contrib-uglify": "~0.2.7",
+    "grunt-contrib-csslint": "~0.2.0",
+    "grunt-contrib-cssmin": "~0.7.0",
+    "grunt-contrib-jshint": "~0.8.0"
+  }
+}

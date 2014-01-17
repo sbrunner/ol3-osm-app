@@ -1,3 +1,4 @@
+
 var style = [new ol.style.Style({
     image: new ol.style.Circle({
         radius: 10,
@@ -9,22 +10,77 @@ var styleFunction = function(feature, resolution) {
     return style;
 };
 
+var layers = {
+    "Humanitaire": new ol.layer.Tile({
+        preload: Infinity,
+        source: new ol.source.XYZ({
+            url: 'http://{a-c}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
+            attributions: [new ol.Attribution({
+                html: 'Tiles courtesy of <a href="http://hot.openstreetmap.org/" target="_blank">Humanitarian OpenStreetMap Team</a>'
+            }), ol.source.OSM.DATA_ATTRIBUTION]
+        })
+    }),
+    "MapQuest ouverte": new ol.layer.Tile({
+        visible: false,
+        preload: Infinity,
+        source: new ol.source.MapQuestOSM()
+    }),
+    "MapBox": new ol.layer.Tile({
+        visible: false,
+        preload: Infinity,
+        source: new ol.source.OSM({
+            url: 'https://api.tiles.mapbox.com/v3/examples.map-51f69fea/{z}/{x}/{y}.jpg80',
+            attributions: [new ol.Attribution({
+                html: '<a href="https://www.mapbox.com/about/maps/" target="_blank">MapBox</a>'
+            }), ol.source.OSM.DATA_ATTRIBUTION]
+        })
+    }),
+    "OpenStreetMap": new ol.layer.Tile({
+        visible: false,
+        preload: Infinity,
+        source: new ol.source.OSM()
+    }),
+    "Carte de transport": new ol.layer.Tile({
+        visible: false,
+        preload: Infinity,
+        source: new ol.source.XYZ({
+            url: 'http://{a-c}.tile2.opencyclemap.org/transport/{z}/{x}/{y}.png',
+            attributions: [new ol.Attribution({
+                html: 'Tiles courtesy of <a href="http://www.opencyclemap.org/" target="_blank">Andy Allen</a>'
+            }), ol.source.OSM.DATA_ATTRIBUTION]
+        })
+    }),
+    "Carte cyclable": new ol.layer.Tile({
+        visible: false,
+        preload: Infinity,
+        source: new ol.source.XYZ({
+            url: 'http://{a-c}.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png',
+            attributions: [new ol.Attribution({
+                html: 'Tiles courtesy of <a href="http://www.opencyclemap.org/" target="_blank">Andy Allen</a>'
+            }), ol.source.OSM.DATA_ATTRIBUTION]
+        })
+    }),
+    "Bing aerial": new ol.layer.Tile({
+        visible: false,
+        preload: Infinity,
+        source: new ol.source.BingMaps({
+            key: 'Ak-dzM4wZjSqTlzveKz5u0d4IQ4bRzVI309GxmkgSVr1ewS6iPSrOvOKhA-CJlm3',
+            imagerySet: 'Aerial'
+        })
+    })
+}
 var map = new ol.Map({
     renderer: ol.RendererHint.CANVAS,
     target: 'map',
-    layers: [
-        new ol.layer.Tile({
-            source: new ol.source.MapQuestOSM()
-        })
-    ],
     view: new ol.View2D({
         center: ol.proj.transform([6.629, 46.517], 'EPSG:4326', 'EPSG:3857'),
         zoom: 10
-    }),
-    controls: ol.control.defaults().extend([
-    ])
+    })
 });
 var view = map.getView();
+$.each(layers, function(name, layer) {
+    map.addLayer(layer);
+});
 
 $.urlParam = function(key) {
     var result = new RegExp(key + "=([^&]*)", "i").exec(window.location.search);
@@ -137,4 +193,22 @@ $("#fullscreen").click(function(event) {
         goog.asserts.assert(goog.isDefAndNotNull(element));
         goog.dom.fullscreen.requestFullScreen(element);
     }
+});
+
+$("#layers").click(function(event) {
+    event.preventDefault();
+
+    var list = "";
+    $.each(layers, function(name, layer) {
+//        list += '<a href="#">' + (this.getVisible() ? "[V] " : "[ ] ") + this.name + "</a>";
+        list += '<a href="#">' + name + "</a>";
+    });
+    $("#layers-list").html(list);
+    $("#layers-list").addClass('selected');
+});
+$("#layers-list").on("click", "a", function(event) {
+    $("#layers-list").removeClass('selected');
+    $.each(layers, function(name, layer) {
+        layer.setVisible(name == event.currentTarget.innerHTML);
+    });
 });

@@ -8,10 +8,19 @@
 <link rel="stylesheet" href="css/jquery-ui-1.10.3.custom.min.css" />
 <link rel="stylesheet" href="css/ol.css" />
 <link rel="stylesheet" href="css/ol3-osm-app.css" />
+<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
 </head>
 <body>
 <div id="map" class="map"></div>
 <input id="search" class="search"></input>
+<div class="toolbar">
+<a id="layers" class="fa fa-picture-o"></a>
+<a id="fullscreen" class="fa fa-expand"></a>
+<a id="geolocation" class="fa fa-location-arrow"></a>
+<a id="north" class="fa fa-arrow-up"></a>
+<a id="routing" class="fa fa-bullseye"></a>
+</div>
+<div id="layers-list" class="layers-list"></div>
 <div id="result" class="result"></div>
 <script type="text/javascript" src="js/ol-whitespace.js"></script>
 <script type="text/javascript" src="js/jquery.js"></script>

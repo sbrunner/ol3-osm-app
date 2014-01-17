@@ -15,8 +15,7 @@ var map = new ol.Map({
     layers: [
         new ol.layer.Tile({
             source: new ol.source.MapQuestOSM()
-        }),
-        waypoint_layer
+        })
     ],
     view: new ol.View2D({
         center: ol.proj.transform([6.629, 46.517], 'EPSG:4326', 'EPSG:3857'),

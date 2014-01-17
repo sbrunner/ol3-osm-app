@@ -11,7 +11,7 @@ module.exports = function(grunt) {
             },
             "ol3-osm-app_tmp": {
                 files: {
-                    'tmp/ol3-osm-app.min.js': ['js/jquery.js', 'js/jquery-ui-1.10.3.custom.js', 'js/ol3-osm-app.js']
+                    'tmp/ol3-osm-app.min.js': ['js/handlebars-v1.3.0.js', 'js/jquery.js', 'js/jquery-ui-1.10.3.custom.js', 'js/ol3-osm-app.js']
                 }
             },
             "ol3-osm-app": {

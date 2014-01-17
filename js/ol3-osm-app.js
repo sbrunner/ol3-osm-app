@@ -112,34 +112,12 @@ $("#search").autocomplete({
 var geolocation = new ol.Geolocation();
 geolocation.setProjection(view.getProjection());
 geolocation.on('change:position', function(event) {
-        geolocation.setTracking(false);
-
-    map.beforeRender(ol.animation.zoom({
-        duration: 500,
-        resolution: view.getResolution()
-    }));
-    view.setZoom(14);
-
     map.beforeRender(ol.animation.pan({
         duration: 500,
         source: view.getCenter()
     }));
     view.setCenter(geolocation.getPosition());
-
-    var features = bases.getAllFeatures();
-    var feature = null;
-    var squaredDist = +Infinity;
-    $.each(features, function() {
-        var candidateSquaredDist =
-            Math.pow(geolocation.getPosition()[0] - this.getGeometry().getCoordinates()[0], 2) +
-            Math.pow(geolocation.getPosition()[1] - this.getGeometry().getCoordinates()[1], 2);
-        if (candidateSquaredDist < squaredDist) {
-            squaredDist = candidateSquaredDist;
-            feature = this;
-        }
-    });
-    if (feature) {
-        // TODO
-    }
 });
-geolocation.setTracking(true);
+$("#geolocation").click(function() {
+    geolocation.setTracking(geolocation.getTracking());
+});

@@ -32,8 +32,81 @@ $.urlParam = function(key) {
 };
 
 var first = true;
+var found = null;
+var geojsonformat = new ol.format.GeoJSON();
+var selectedStyle = new ol.style.Style({
+    stroke: new ol.style.Stroke({
+        color: 'rgba(255, 100, 0, 0.2)',
+        width: 2
+    }),
+    fill: new ol.style.Fill({
+        color: 'rgba(255, 100, 0, 0.2)'
+    }),
+    image: new ol.style.Circle({
+        radius: 8,
+        fill: new ol.style.Stroke({color: 'rgba(255, 100, 0, 0.2)'}),
+        stroke: new ol.style.Stroke({
+            color: 'rgba(255, 100, 0, 0.2)',
+            width: 2
+        })
+    })
+});
+this.map.on('postcompose', function(evt) {
+    if (found) {
+        var render = evt.getRender();
+        render.drawFeature(found.feature, selectedStyle);
+    }
+});
 $("#search").autocomplete({
-    // TODO
+    source: function(request, responce) {
+        $.ajax({
+            url: 'http://nominatim.openstreetmap.org/search',
+            dataType: "jsonp",
+            jsonp: 'json_callback',
+            data: {
+                format: 'jsonv2',
+                q: request.term,
+                limit: 20,
+                polygon_geojson: 1,
+            },
+            success: function(data) {
+                responce($.map(data, function(item) {
+                    var geom = geojsonformat.readGeometry(item.geojson);
+                    geom.transform(ol.proj.getTransform('EPSG:4326', 'EPSG:3857'));
+                    item.feature = new ol.Feature(geom);
+                    return {
+                        label: "[" + geom.getType() + "] " + item.display_name,
+                        value: item.display_name,
+                        item: item
+                    }
+                }));
+            }
+        })
+    },
+    select: function(event, result) {
+        found = result.item.item;
+
+        map.requestRenderFrame();
+
+        if (found.feature.getGeometry().getType() == 'Point') {
+            map.beforeRender(ol.animation.pan({
+                duration: 500,
+                source: view.getCenter()
+            }));
+            view.setCenter(found.feature.getGeometry().getCoordinates());
+        }
+        else {
+            map.beforeRender(ol.animation.zoom({
+                duration: 500,
+                resolution: view.getResolution()
+            }));
+            map.beforeRender(ol.animation.pan({
+                duration: 500,
+                source: view.getCenter()
+            }));
+            view.fitExtent(found.feature.getGeometry().getExtent(), map.getSize());
+        }
+    }
 });
 
 var geolocation = new ol.Geolocation();

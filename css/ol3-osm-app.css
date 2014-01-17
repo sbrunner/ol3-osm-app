@@ -9,4 +9,8 @@ html, body, .map {
     top: 10px;
     right: 10px;
     font-size: large;
+    width: 50%;
+}
+.ol-attribution {
+    border-radius: 2px 0 0 0;
 }

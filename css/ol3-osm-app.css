@@ -34,7 +34,8 @@ html, body, .map {
     padding: 10px;
     border-top: 1px solid black;
     font-size: 40px;
-    text-align:center
+    text-align: center;
+    text-decoration: none;
 }
 .toolbar a:first-child {
     border-top: none;
@@ -59,18 +60,21 @@ html, body, .map {
 }
 .layers-list {
     position: absolute;
-    transition: all 1s;
+    transition: opacity 1s;
     padding: 0 15px;
     width: 94%;
     height: 94%;
     top: 3%;
     left: 3%;
     opacity: 0;
+    visibility: hidden;
     background-color: grey;
     background-color: rgba(0, 0, 0, 0.5);
     border: 1px solid black;
     border-radius: 3px;
 }
 .layers-list.selected {
+    transition: visibility 0 ease 1s;
     opacity: 100%;
+    visibility: visible;
 }

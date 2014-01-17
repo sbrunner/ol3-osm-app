@@ -118,6 +118,23 @@ geolocation.on('change:position', function(event) {
     }));
     view.setCenter(geolocation.getPosition());
 });
-$("#geolocation").click(function() {
+$("#geolocation").click(function(event) {
+    event.preventDefault();
     geolocation.setTracking(geolocation.getTracking());
+});
+
+$("#fullscreen").click(function(event) {
+    if (!goog.dom.fullscreen.isSupported()) {
+        return;
+    }
+    event.preventDefault();
+    if (goog.dom.fullscreen.isFullScreen()) {
+        goog.dom.fullscreen.exitFullScreen();
+    } else {
+        var target = map.getTarget();
+        goog.asserts.assert(goog.isDefAndNotNull(target));
+        var element = goog.dom.getElement(target);
+        goog.asserts.assert(goog.isDefAndNotNull(element));
+        goog.dom.fullscreen.requestFullScreen(element);
+    }
 });

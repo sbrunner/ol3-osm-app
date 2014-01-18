@@ -94,6 +94,7 @@ $(".toolbar div a").hover(function(event) {
     var pos = $(event.target).offset();
     tooltip.css('top', pos.top);
     tooltip.css('right', $(document).width() - pos.left + 10);
+    tooltip.delay(5000).fadeOut();
 }, function(event) {
     $(".tooltip").remove();
 });
@@ -238,8 +239,10 @@ $("#geolocation").click(function(event) {
 var deviceOrientation = new ol.DeviceOrientation();
 //deviceOrientation.bindTo('alpha', map, 'rotation');
 deviceOrientation.on('propertychange', function(event) {
-    if (event.getKey() == 'alpha') {
-        map.setRotation(deviceOrientation.get('alpha'));
+    if (event.getKey() == ol.DeviceOrientationProperty.HEADING) {
+        view.setRotation(
+            deviceOrientation.get(ol.DeviceOrientationProperty.HEADING)
+        );
     }
 });
 $("#orientation").click(function(event) {

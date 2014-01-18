@@ -145,6 +145,8 @@ this.map.on('postcompose', function(evt) {
         render.drawFeature(found.feature, selectedStyle);
     }
 });
+var result_template = Handlebars.compile($('#result-template').html());
+var search_template = Handlebars.compile($('#search-template').html());
 $("#search").autocomplete({
     source: function(request, responce) {
         var extent = view.calculateExtent(map.getSize());
@@ -169,7 +171,7 @@ $("#search").autocomplete({
                     geom.transform(ol.proj.getTransform('EPSG:4326', 'EPSG:3857'));
                     item.feature = new ol.Feature(geom);
                     return {
-                        label: item.display_name + " [" + item.category + ": " +  item.type + "]",
+                        label: search_template(item),
                         value: item.display_name,
                         item: item
                     }
@@ -200,7 +202,16 @@ $("#search").autocomplete({
             }));
             view.fitExtent(found.feature.getGeometry().getExtent(), map.getSize());
         }
+
+        $("#result").html(result_template(found));
+        $("#result").addClass('selected');
     }
+});
+$("#search").data().uiAutocomplete._renderItem = function(ul, item) {
+    return $("<li>").html(item.label).appendTo(ul);
+};
+$("#result").click(function (event) {
+    $("#result").removeClass('selected');
 });
 
 var geolocation = new ol.Geolocation();

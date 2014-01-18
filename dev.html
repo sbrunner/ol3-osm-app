@@ -29,8 +29,28 @@
 <input id="search" class="search" placeholder="Recherche"></input>
 <div id="result" class="result"></div>
 <script type="text/javascript" src="js/ol-whitespace.js"></script>
+<script type="text/javascript" src="js/handlebars-v1.3.0.js"></script>
 <script type="text/javascript" src="js/jquery.js"></script>
 <script type="text/javascript" src="js/jquery-ui-1.10.3.custom.js"></script>
+<script id="search-template" type="text/x-handlebars-template">
+<img src="{{icon}}"></img> {{display_name}} <small>[{{category}}: {{type}}]</small>
+</script>
+<script id="result-template" type="text/x-handlebars-template">
+<h5><img src="{{icon}}"></img> {{display_name}}</h5>
+{{#if address}}
+<p>
+{{#if address.house}}
+{{address.house}}<br />
+{{/if}}
+{{#if address.road}}
+{{address.road}} {{address.house_number}}<br />
+{{/if}}
+{{address.country_code}}-{{address.postcode}} {{address.city}}, {{address.country}}
+</p>
+{{/if}}
+<p>{{category}}:&nbsp;{{type}}, Importance:&nbsp;{{importance}}, Rank:&nbsp;{{place_rank}}<br />
+{{licence}}</p>
+</script>
 <script type="text/javascript" src="js/ol3-osm-app.js"></script>
 </body>
 </html>

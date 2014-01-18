@@ -88,6 +88,16 @@ $.urlParam = function(key) {
     return result && unescape(result[1]) || "";
 };
 
+$(".toolbar div a").hover(function(event) {
+    $('body').append('<div class="tooltip"><div>' + event.target.getAttribute('data-tooltip') + '</div></div>');
+    var tooltip = $('.tooltip');
+    var pos = $(event.target).offset();
+    tooltip.css('top', pos["top"]);
+    tooltip.css('right', $(document).width() - pos["left"] + 10);
+}, function(event) {
+    $(".tooltip").remove();
+});
+
 function zoom(delta) {
     var currentResolution = view.getResolution();
     if (goog.isDef(currentResolution)) {
@@ -200,10 +210,10 @@ $("#geolocation").click(function(event) {
     event.preventDefault();
     geolocation.setTracking(!geolocation.getTracking());
     if (geolocation.getTracking()) {
-        $(event.currentTarget).addClass('selected');
+        $(event.target).addClass('selected');
     }
     else {
-        $(event.currentTarget).removeClass('selected');
+        $(event.target).removeClass('selected');
     }
 });
 
@@ -218,11 +228,11 @@ $("#orientation").click(function(event) {
     event.preventDefault();
     deviceOrientation.setTracking(!deviceOrientation.getTracking());
     if (deviceOrientation.getTracking()) {
-        $(event.currentTarget).addClass('selected');
+        $(event.target).addClass('selected');
     }
     else {
         map.setRotation(0);
-        $(event.currentTarget).removeClass('selected');
+        $(event.target).removeClass('selected');
     }
 });
 
@@ -270,6 +280,6 @@ $("#layers").click(function(event) {
 $("#layers-list").on("click", "a", function(event) {
     $("#layers-list").removeClass('selected');
     $.each(layers, function(name, layer) {
-        layer.setVisible(name == event.currentTarget.innerHTML);
+        layer.setVisible(name == event.target.innerHTML);
     });
 });

@@ -52,13 +52,26 @@ html, body, .map {
 .toolbar div a.selected:focus, .toolbar div a.selected:hover {
     box-shadow: 0 0 3px 2px #a76cff;
 }
-
 .toolbar div a:first-child {
     border-top-left-radius: 3px;
 }
 .toolbar div a:last-child {
     border-bottom-left-radius: 3px;
     margin-bottom: 10px;
+}
+.tooltip {
+    background-color: grey;
+    background-color: rgba(255, 255, 255, 0.7);
+    position: absolute;
+    border-radius: 3px;
+    padding: 0 15px;
+    font-family: Sans-serif;
+    height: 40px;
+    display: table; 
+}
+.tooltip div {
+    display: table-cell;
+    vertical-align: middle;
 }
 .zoom-in:before {
     content: "+";

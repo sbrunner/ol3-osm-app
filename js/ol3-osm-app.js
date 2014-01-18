@@ -156,6 +156,11 @@ $("#search").autocomplete({
                 q: request.term,
                 limit: 20,
                 polygon_geojson: 1,
+/*                maxlat	50.12057809796008
+                maxlon	9.107666015625
+                minlat	47.754097979680026
+                minlon	-2.054443359375
+                zoom	7*/
             },
             success: function(data) {
                 responce($.map(data, function(item) {
@@ -163,7 +168,7 @@ $("#search").autocomplete({
                     geom.transform(ol.proj.getTransform('EPSG:4326', 'EPSG:3857'));
                     item.feature = new ol.Feature(geom);
                     return {
-                        label: "[" + geom.getType() + "] " + item.display_name,
+                        label: item.display_name + "[" + item.category + ": " +  item.type + "] ",
                         value: item.display_name,
                         item: item
                     }
@@ -274,11 +279,13 @@ $("#layers").click(function(event) {
 //        list += '<a href="#">' + (this.getVisible() ? "[V] " : "[ ] ") + this.name + "</a>";
         list += '<a href="#">' + name + "</a>";
     });
-    $("#layers-list").html(list);
-    $("#layers-list").addClass('selected');
+    $('body').append('<div class="layers-list">' + list + '</div>');
+    var element = $('.layers-list');
+    var pos = $(event.target).offset();
+    element.css('right', $(document).width() - pos["left"] + 10);
 });
-$("#layers-list").on("click", "a", function(event) {
-    $("#layers-list").removeClass('selected');
+$("body").on("click", ".layers-list a", function(event) {
+    $(".layers-list").remove();
     $.each(layers, function(name, layer) {
         layer.setVisible(name == event.target.innerHTML);
     });

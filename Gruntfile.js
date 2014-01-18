@@ -28,7 +28,9 @@ module.exports = function(grunt) {
             "ol3-osm-app": {
                 options: {
                     "box-model": false,
-                    'adjoining-classes': false
+                    'adjoining-classes': false,
+                    'qualified-headings': false,
+                    'overqualified-elements': false
                 },
                 src: ['css/ol3-osm-app.css']
             }
@@ -39,6 +41,13 @@ module.exports = function(grunt) {
                     'build/ol3-osm-app.css': ['css/jquery-ui-1.10.3.custom.min.css', 'css/ol.css', 'css/ol3-osm-app.css']
                 }
             }
+        },
+        copy: {
+            copy_images: {
+                files: [
+                    { expand: true, cwd: 'css', src: ['images/**'], dest: 'build' },
+                ]
+            }
         }
     });
 
@@ -46,9 +55,10 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-csslint');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
+    grunt.loadNpmTasks('grunt-contrib-copy');
   
 
     // Default task(s).
-    grunt.registerTask('default', ['jshint', 'csslint', 'uglify', 'cssmin']);
+    grunt.registerTask('default', ['jshint', 'csslint', 'uglify', 'cssmin', 'copy']);
 
 };

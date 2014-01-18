@@ -68,7 +68,7 @@ var layers = {
             imagerySet: 'Aerial'
         })
     })
-}
+};
 var map = new ol.Map({
     renderer: ol.RendererHint.CANVAS,
     target: 'map',
@@ -92,8 +92,8 @@ $(".toolbar div a").hover(function(event) {
     $('body').append('<div class="tooltip"><div>' + event.target.getAttribute('data-tooltip') + '</div></div>');
     var tooltip = $('.tooltip');
     var pos = $(event.target).offset();
-    tooltip.css('top', pos["top"]);
-    tooltip.css('right', $(document).width() - pos["left"] + 10);
+    tooltip.css('top', pos.top);
+    tooltip.css('right', $(document).width() - pos.left + 10);
 }, function(event) {
     $(".tooltip").remove();
 });
@@ -174,10 +174,10 @@ $("#search").autocomplete({
                         label: search_template(item),
                         value: item.display_name,
                         item: item
-                    }
+                    };
                 }));
             }
-        })
+        });
     },
     select: function(event, result) {
         found = result.item.item;
@@ -206,9 +206,10 @@ $("#search").autocomplete({
         $("#result").html(result_template(found));
         $("#result").addClass('selected');
     }
-});
-$("#search").data().uiAutocomplete._renderItem = function(ul, item) {
-    return $("<li>").html(item.label).appendTo(ul);
+}).data( "ui-autocomplete" )._renderItem = function( ul, item ) {
+    return $("<li>")
+        .append("<a>" + item.label + "</a>")
+        .appendTo(ul);
 };
 $("#result").click(function (event) {
     $("#result").removeClass('selected');
@@ -294,7 +295,7 @@ $("#layers").click(function(event) {
     $('body').append('<div class="layers-list">' + list + '</div>');
     var element = $('.layers-list');
     var pos = $(event.target).offset();
-    element.css('right', $(document).width() - pos["left"] + 10);
+    element.css('right', $(document).width() - pos.left + 10);
 });
 $("body").on("click", ".layers-list a", function(event) {
     $(".layers-list").remove();

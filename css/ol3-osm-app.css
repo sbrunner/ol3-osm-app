@@ -19,10 +19,8 @@ html, body, .map {
 }
 .ol-attribution {
     border-radius: 4px 0 0 0;
+    background-color: grey;
     background-color: rgba(0, 0, 0, 0.6);
-}
-.ol-zoom a {
-    background-color: rgba(0, 0, 0, 0.4);
 }
 .toolbar {
     position: absolute;
@@ -110,12 +108,11 @@ html, body, .map {
 .layers-list {
     position: absolute;
     transition: all 1s;
-    padding: 0 15px;
+    padding: 0 5px;
     top: 10px;
     background-color: white;
     background-color: rgba(255, 255, 255, 0.5);
     border-radius: 3px;
-    padding: 0 5px;
 }
 .layers-list a {
     display: block;

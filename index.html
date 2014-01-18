@@ -5,14 +5,47 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Test Page</title>
-<link rel="stylesheet" href="build/ol3-osm-map.css" />
+<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+<link rel="stylesheet" href="build/ol3-osm-app.css" />
 <style>
 
 </style>
 </head>
 <body>
-<div id="map" class="map"></div>
-<input id="search" class="search"></input>
-<script type="text/javascript" src="build/ol3-osm-map.min.js"></script>
+<div id="map" class="map">
+<div class="toolbar">
+    <div>
+        <a id="zoom-in" class="zoom-in" href="#zoomIn" data-tooltip="Vue rapprochée"></a>
+        <a id="zoom-out" class="zoom-out" href="#zoomOut" data-tooltip="Vue éloignée"></a>
+        <a id="geolocation" class="fa fa-location-arrow" href="#geolocation" data-tooltip="Ma position"></a>
+        <a id="orientation" class="fa fa-arrow-up" href="#orientation" data-tooltip="Changer l'orientation"></a>
+    </div>
+    <div>
+        <a id="fullscreen" class="fa fa-expand" href="#fullscreen" data-tooltip="Plen écran"></a>
+        <a id="layers" class="fa fa-picture-o layers" href="#layers" data-tooltip="Carte"></a>
+        <a id="routing" class="fa fa-bullseye" href="#routing" data-tooltip="Aller a la position"></a>
+    </div>
+</div>
+</div>
+<input id="search" class="search" placeholder="Recherche"></input>
+<div id="result" class="result"></div>
+<script id="search-template" type="text/x-handlebars-template">
+<img src="{{icon}}"></img> {{display_name}}
+</script>
+<script id="result-template" type="text/x-handlebars-template">
+<h5><img src="{{icon}}"></img> {{display_name}}</h5>
+{{#if address}}
+<p>
+{{#if address.house}}
+{{address.house}}<br />
+{{/if}}
+{{#if address.road}}
+{{address.road}} {{address.house_number}}<br />
+{{/if}}
+{{address.country_code}}-{{address.postcode}} {{address.city}}, {{address.country}}
+</p>
+{{/if}}
+</script>
+<script type="text/javascript" src="build/ol3-osm-app.min.js"></script>
 </body>
 </html>

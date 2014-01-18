@@ -147,6 +147,8 @@ this.map.on('postcompose', function(evt) {
 });
 $("#search").autocomplete({
     source: function(request, responce) {
+        var extent = view.calculateExtent(map.getSize());
+        extent = ol.extent.transform(extent, ol.proj.getTransform('EPSG:3857', 'EPSG:4326'));
         $.ajax({
             url: 'http://nominatim.openstreetmap.org/search',
             dataType: "jsonp",
@@ -156,11 +158,10 @@ $("#search").autocomplete({
                 q: request.term,
                 limit: 20,
                 polygon_geojson: 1,
-/*                maxlat	50.12057809796008
-                maxlon	9.107666015625
-                minlat	47.754097979680026
-                minlon	-2.054443359375
-                zoom	7*/
+                viewbox: extent[0] + "," + extent[1] + "," + extent[2] + "," + extent[3],
+                //bounded: 1,
+                zoom: view.getZoom(),
+                addressdetails: 1
             },
             success: function(data) {
                 responce($.map(data, function(item) {
@@ -168,7 +169,7 @@ $("#search").autocomplete({
                     geom.transform(ol.proj.getTransform('EPSG:4326', 'EPSG:3857'));
                     item.feature = new ol.Feature(geom);
                     return {
-                        label: item.display_name + "[" + item.category + ": " +  item.type + "] ",
+                        label: item.display_name + " [" + item.category + ": " +  item.type + "]",
                         value: item.display_name,
                         item: item
                     }

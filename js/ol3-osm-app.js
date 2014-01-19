@@ -252,7 +252,7 @@ $("#orientation").click(function(event) {
         $(event.target).addClass('selected');
     }
     else {
-        map.setRotation(0);
+        view.setRotation(0);
         $(event.target).removeClass('selected');
     }
 });

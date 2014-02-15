@@ -137,6 +137,49 @@ var routingOverlay = new ol.FeatureOverlay({
         })];
     }
 });
+var destIcon = new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+    anchor: [0.5, 1],
+    anchorXUnits: 'fraction',
+    anchorYUnits: 'fraction',
+    size: [25, 25],
+    src: "image/destination50.png"
+}));
+destIcon.load();
+var destinationOverlay = new ol.FeatureOverlay({
+    map: map,
+    style: function() {
+        return [new ol.style.Style({
+            image: destIcon
+        })];
+    }
+});
+var instructionsOverlay = new ol.FeatureOverlay({
+    map: map,
+    style: function() {
+        return [new ol.style.Style({
+            image: new ol.style.Circle({
+                radius: 5,
+                fill: new ol.style.Fill({
+                    color: 'rgba(0, 100, 255, 0.8)'
+                })
+            })
+        })];
+    }
+});
+var nextInstructionOverlay = new ol.FeatureOverlay({
+    map: map,
+    style: function() {
+        return [new ol.style.Style({
+            image: new ol.style.Circle({
+                radius: 7,
+                stroke: new ol.style.Stroke({
+                    color: 'rgba(0, 255, 255, 0.8)',
+                    width: 3
+                })
+            })
+        })];
+    }
+});
 var foundCentroid;
 var foundOverlay = new ol.FeatureOverlay({
     map: map,
@@ -237,11 +280,11 @@ var icon = new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
     anchor: [0.5, 1],
     anchorXUnits: 'fraction',
     anchorYUnits: 'fraction',
-    size: [52, 74],
+    size: [26, 37],
     src: "image/location74.png"
 }));
 icon.load();
-this.positionOverlay = new ol.FeatureOverlay({
+positionOverlay = new ol.FeatureOverlay({
     map: map,
     style: function() {
         return [new ol.style.Style({
@@ -307,7 +350,7 @@ goog.events.listen(goog.global.document, goog.dom.fullscreen.EventType.CHANGE,
             $("#fullscreen").removeClass('selected');
             target.removeClass('fullscreen');
         }
-    }, false, this
+    }, false
 );
 $("#fullscreen").click(function(event) {
     event.preventDefault();
@@ -347,7 +390,7 @@ $("body").on("click", ".layers-list a", function(event) {
     });
 });
 
-var url = Handlebars.compile('http://graphhopper.com/routing/api/route?point={{start_lat}},{{start_lon}}&point={{end_lat}},{{end_lon}}&type=jsonp&locale=fr-ch&');
+var url = Handlebars.compile('http://graphhopper.com/routing/api/route?point={{end_lat}},{{end_lon}}&point={{start_lat}},{{start_lon}}&type=jsonp&locale=fr-ch&');
 var request = new GHRequest('graphhopper.com');
 var calculateRouting = true;
 routingGeolocation.on('change:position', function(event) {
@@ -395,8 +438,26 @@ routingGeolocation.on('change:position', function(event) {
                 ol.proj.transform(geom.getFlatCoordinates(), 'EPSG:4326', 'EPSG:3857')
             );
             routingOverlay.setFeatures(new ol.Collection([new ol.Feature(geom)]));
+            destinationOverlay.setFeatures(new ol.Collection([new ol.Feature(
+                new ol.geom.Point(ol.proj.transform(foundCentroid, 'EPSG:4326', 'EPSG:3857'))
+            )]));
+            var ll = json.route.instructions.latLngs[1];
+            nextInstructionOverlay.setFeatures(new ol.Collection([new ol.Feature(
+                new ol.geom.Point(ol.proj.transform(
+                    [ll[1], ll[0]], 'EPSG:4326', 'EPSG:3857'
+                ))
+            )]));
+            instructionsOverlay.setFeatures(new ol.Collection([]));
+            for (var i = 0 ; i < json.route.instructions.latLngs.length ; i++) {
+                var ll = json.route.instructions.latLngs[i];
+                instructionsOverlay.addFeature(new ol.Feature(
+                    new ol.geom.Point(ol.proj.transform(
+                        [ll[1], ll[0]], 'EPSG:4326', 'EPSG:3857'
+                    ))
+                ));
+            }
 
-            var indi = json.route.instructions.indications[0];
+            var indi = json.route.instructions.indications[1];
             if (indi == -3)
                 indi = "sharp_left";
             else if (indi == -2)
@@ -417,7 +478,7 @@ routingGeolocation.on('change:position', function(event) {
             $("#routing-instructions").html(routing_template({
                 icon: indi,
                 dist: Math.round(json.route.instructions.distances[0]),
-                instruction: json.route.instructions.descriptions[0]
+                instruction: json.route.instructions.descriptions[1]
             }));
             $("#routing-instructions").addClass('selected');
         });

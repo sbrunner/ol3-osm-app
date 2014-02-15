@@ -1,13 +1,10 @@
 Routing:
-  - destination feature
-  - display all instruction point
-  - display next instruction point
   - follow without call the service
-  - add the distance to the next instruction
   - reroute when it's nessesery
   - end routing on destination reatch
+  - adapt zoom on speed and next instruction
+  - orientaton using the road dirrection
   - Routing in black background
-  - Use destination centroid
 - orientation changes to many times
 - webapp
 - firfox os app

@@ -8,11 +8,14 @@ html, body, .map {
 }
 .search {
     position: absolute;
-    opacity: 0.8,
+    opacity: 0.8;
     top: 10px;
     left: 10px;
     font-size: large;
     width: 50%;
+    padding: 2px 5px;
+    border: solid 1px grey;
+    border: solid 1px rgba(0, 0, 0, 0.3);
     box-shadow: 0 0 4px 0 #fff;
 }
 .search:focus, .search:hover {

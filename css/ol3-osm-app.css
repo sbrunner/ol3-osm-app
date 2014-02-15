@@ -8,6 +8,7 @@ html, body, .map {
 }
 .search {
     position: absolute;
+    opacity: 0.8,
     top: 10px;
     left: 10px;
     font-size: large;
@@ -105,7 +106,7 @@ html, body, .map {
     display: none;
     position: absolute;
     overflow: hidden;
-    padding: 5px 15px 5px 15px;
+    padding: 5px;
     left: 10px;
     top: 45px;
     background-color: #fff;

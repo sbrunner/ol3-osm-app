@@ -7,6 +7,7 @@ Routing:
   - reroute when it's nessesery
   - end routing on destination reatch
   - Routing in black background
+  - Use destination centroid
 - orientation changes to many times
 - webapp
 - firfox os app

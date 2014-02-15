@@ -30,10 +30,12 @@
 </div>
 <input id="search" class="search" placeholder="Recherche"></input>
 <div id="result" class="result"></div>
+<div id="routing-instructions" class="routing"></div>
 <script type="text/javascript" src="js/ol-whitespace.js"></script>
 <script type="text/javascript" src="js/handlebars-v1.3.0.js"></script>
 <script type="text/javascript" src="js/jquery.js"></script>
 <script type="text/javascript" src="js/jquery-ui-1.10.3.custom.js"></script>
+<script type="text/javascript" src="js/ghrequest.js"></script>
 <script id="search-template" type="text/x-handlebars-template">
 <img src="{{icon}}"></img> {{display_name}} <small>[{{category}}: {{type}}]</small>
 </script>
@@ -52,6 +54,12 @@
 {{/if}}
 <p>{{category}}:&nbsp;{{type}}, Importance:&nbsp;{{importance}}, Rank:&nbsp;{{place_rank}}<br />
 {{licence}}</p>
+</script>
+<script id="routing-template" type="text/x-handlebars-template">
+<table><tr>
+<td><img width="32px" height="32px" src="http://graphhopper.com/maps/img/{{icon}}.png"></img></td>
+<td>Dans {{dist}}m<br />{{instruction}}</td>
+</tr></table>
 </script>
 <script type="text/javascript" src="js/ol3-osm-app.js"></script>
 </body>

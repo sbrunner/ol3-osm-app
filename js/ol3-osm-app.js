@@ -126,12 +126,23 @@ $("#zoom-out").click(function(event) {
     zoom(-1);
 });
 
+var routingOverlay = new ol.FeatureOverlay({
+    map: map,
+    style: function() {
+        return [new ol.style.Style({
+            stroke: new ol.style.Stroke({
+                color: 'rgba(0, 100, 255, 0.8)',
+                width: 2
+            })
+        })];
+    }
+});
 var foundOverlay = new ol.FeatureOverlay({
     map: map,
     style: function() {
         return [new ol.style.Style({
             stroke: new ol.style.Stroke({
-                color: 'rgba(255, 100, 0, 0.2)',
+                color: 'rgba(255, 100, 0, 0.4)',
                 width: 2
             }),
             fill: new ol.style.Fill({
@@ -141,17 +152,18 @@ var foundOverlay = new ol.FeatureOverlay({
                 radius: 8,
                 fill: new ol.style.Stroke({color: 'rgba(255, 100, 0, 0.2)'}),
                 stroke: new ol.style.Stroke({
-                    color: 'rgba(255, 100, 0, 0.2)',
-                    width: 2
+                    color: 'rgba(255, 100, 0, 0.8)',
+                    width: 1
                 })
             })
-        })]
+        })];
     }
 });
 var first = true;
 var geojsonformat = new ol.format.GeoJSON();
 var result_template = Handlebars.compile($('#result-template').html());
 var search_template = Handlebars.compile($('#search-template').html());
+var routing_template = Handlebars.compile($('#routing-template').html());
 $("#search").autocomplete({
     source: function(request, responce) {
         var extent = view.calculateExtent(map.getSize());
@@ -251,6 +263,7 @@ geolocation.on('change:position', function(event) {
 });
 $("#geolocation").click(function(event) {
     event.preventDefault();
+    routingGeolocation.setTracking(false);
     geolocation.setTracking(!geolocation.getTracking());
     if (geolocation.getTracking()) {
         $(event.target).addClass('selected');
@@ -325,8 +338,109 @@ $("#layers").click(function(event) {
     element.css('right', $(document).width() - pos.left + 10);
 });
 $("body").on("click", ".layers-list a", function(event) {
+    event.preventDefault();
     $(".layers-list").remove();
     $.each(layers, function(name, layer) {
         layer.setVisible(name == event.target.innerHTML);
     });
+});
+
+var url = Handlebars.compile('http://graphhopper.com/routing/api/route?point={{start_lat}},{{start_lon}}&point={{end_lat}},{{end_lon}}&type=jsonp&locale=fr-ch&');
+var request = new GHRequest('graphhopper.com');
+var calculateRouting = true;
+routingGeolocation.on('change:position', function(event) {
+    if (view.getCenter()) {
+        map.beforeRender(ol.animation.pan({
+            duration: 500,
+            source: view.getCenter()
+        }));
+    }
+    var pos = routingGeolocation.getPosition();
+    view.setCenter(pos);
+    self.positionOverlay.setFeatures(new ol.Collection([
+        new ol.Feature(new ol.geom.Point(pos))
+    ]));
+
+    if (calculateRouting) {
+        calculateRouting = false;
+        pos = ol.proj.transform(pos, 'EPSG:3857', 'EPSG:4326');
+        var flatCoords = foundOverlay.getFeatures().getAt(0).getGeometry().getFlatCoordinates();
+        var start = ol.proj.transform([flatCoords[0], flatCoords[1]], 'EPSG:3857', 'EPSG:4326');
+        request.doRequest(url({
+            start_lon: start[0],
+            start_lat: start[1],
+            end_lon: pos[0],
+            end_lat: pos[1]
+        }), function(json) {
+            if (json.info.errors) {
+                var tmpErrors = json.info.errors;
+                console.log(tmpErrors);
+                var html = "";
+                for (var m = 0; m < tmpErrors.length; m++) {
+                    html.append("<div class='error'>" + tmpErrors[m].message + "</div>");
+                }
+                $("#routing-instructions").html(html);
+                $("#routing-instructions").addClass('selected');
+                return;
+            } else if (json.info.routeFound === false) {
+                $("#routing-instructions").html('Route not found! Disconnected areas?');
+                $("#routing-instructions").addClass('selected');
+                return;
+            }
+
+            routingOverlay.setFeatures(new ol.Collection([new ol.Feature(
+                geojsonformat.readGeometry(json.route.data)
+            )]));
+
+            var indi = json.route.instructions.indications[0];
+            if (indi == -3)
+                indi = "sharp_left";
+            else if (indi == -2)
+                indi = "left";
+            else if (indi == -1)
+                indi = "slight_left";
+            else if (indi === 0)
+                indi = "continue";
+            else if (indi == 1)
+                indi = "slight_right";
+            else if (indi == 2)
+                indi = "right";
+            else if (indi == 3)
+                indi = "sharp_right";
+            else if (indi == 4)
+                indi = "marker-to";
+
+            $("#routing-instructions").html(routing_template({
+                icon: indi,
+                dist: Math.round(json.route.instructions.distances[0]),
+                instruction: json.route.instructions.descriptions[0]
+            }));
+            $("#routing-instructions").addClass('selected');
+        });
+    }
+});
+$("#routing").click(function(event) {
+    event.preventDefault();
+    if (foundOverlay.getFeatures().getLength() == 1) {
+        // desable geolocation
+        geolocation.setTracking(false);
+        $("#geolocation").removeClass('selected');
+        // hide result
+        $("#result").removeClass('selected');
+        // enhable routing geolocation
+        routingGeolocation.setTracking(!routingGeolocation.getTracking());
+        if (routingGeolocation.getTracking()) {
+            $(event.target).addClass('selected');
+        }
+        else {
+            $(event.target).removeClass('selected');
+        }
+    } else {
+        $("#routing-instructions").html('You should do a search before start the routing.');
+        $("#routing-instructions").addClass('selected');
+    }
+});
+
+$("#routing-instructions").click(function (event) {
+    $("#routing-instructions").removeClass('selected');
 });

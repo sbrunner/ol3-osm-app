@@ -101,6 +101,20 @@ html, body, .map {
 .result h5 img {
     float: right;
 }
+.routing {
+    display: none;
+    position: absolute;
+    overflow: hidden;
+    padding: 5px 15px 5px 15px;
+    left: 10px;
+    top: 45px;
+    background-color: #fff;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 5px;
+}
+.routing.selected {
+    display: block;
+}
 
 .fullscreen .toolbar div a.layers {
     display: none;

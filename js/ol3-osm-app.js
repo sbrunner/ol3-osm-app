@@ -449,7 +449,7 @@ routingGeolocation.on('change:position', function(event) {
             )]));
             instructionsOverlay.setFeatures(new ol.Collection([]));
             for (var i = 0 ; i < json.route.instructions.latLngs.length ; i++) {
-                var ll = json.route.instructions.latLngs[i];
+                ll = json.route.instructions.latLngs[i];
                 instructionsOverlay.addFeature(new ol.Feature(
                     new ol.geom.Point(ol.proj.transform(
                         [ll[1], ll[0]], 'EPSG:4326', 'EPSG:3857'

@@ -1,15 +1,4 @@
 
-var style = [new ol.style.Style({
-    image: new ol.style.Circle({
-        radius: 10,
-        fill: new ol.style.Stroke({color: 'rgba(0, 0, 0, 0.2)'}),
-        stroke: new ol.style.Stroke({color: 'rgba(0, 0, 0, 0.7)', width: 1})
-    })
-})];
-var styleFunction = function(feature, resolution) {
-    return style;
-};
-
 var layers = {
     "Humanitaire": new ol.layer.Tile({
         preload: Infinity,
@@ -137,32 +126,30 @@ $("#zoom-out").click(function(event) {
     zoom(-1);
 });
 
-var first = true;
-var found = null;
-var geojsonformat = new ol.format.GeoJSON();
-var selectedStyle = new ol.style.Style({
-    stroke: new ol.style.Stroke({
-        color: 'rgba(255, 100, 0, 0.2)',
-        width: 2
-    }),
-    fill: new ol.style.Fill({
-        color: 'rgba(255, 100, 0, 0.2)'
-    }),
-    image: new ol.style.Circle({
-        radius: 8,
-        fill: new ol.style.Stroke({color: 'rgba(255, 100, 0, 0.2)'}),
-        stroke: new ol.style.Stroke({
-            color: 'rgba(255, 100, 0, 0.2)',
-            width: 2
-        })
-    })
-});
-this.map.on('postcompose', function(evt) {
-    if (found) {
-        var render = evt.getRender();
-        render.drawFeature(found.feature, selectedStyle);
+var foundOverlay = new ol.FeatureOverlay({
+    map: map,
+    style: function() {
+        return [new ol.style.Style({
+            stroke: new ol.style.Stroke({
+                color: 'rgba(255, 100, 0, 0.2)',
+                width: 2
+            }),
+            fill: new ol.style.Fill({
+                color: 'rgba(255, 100, 0, 0.2)'
+            }),
+            image: new ol.style.Circle({
+                radius: 8,
+                fill: new ol.style.Stroke({color: 'rgba(255, 100, 0, 0.2)'}),
+                stroke: new ol.style.Stroke({
+                    color: 'rgba(255, 100, 0, 0.2)',
+                    width: 2
+                })
+            })
+        })]
     }
 });
+var first = true;
+var geojsonformat = new ol.format.GeoJSON();
 var result_template = Handlebars.compile($('#result-template').html());
 var search_template = Handlebars.compile($('#search-template').html());
 $("#search").autocomplete({
@@ -198,16 +185,15 @@ $("#search").autocomplete({
         });
     },
     select: function(event, result) {
-        found = result.item.item;
+        var feature = result.item.item.feature;
+        foundOverlay.setFeatures(new ol.Collection([feature]));
 
-        map.requestRenderFrame();
-
-        if (found.feature.getGeometry().getType() == 'Point') {
+        if (feature.getGeometry().getType() == 'Point') {
             map.beforeRender(ol.animation.pan({
                 duration: 500,
                 source: view.getCenter()
             }));
-            view.setCenter(found.feature.getGeometry().getCoordinates());
+            view.setCenter(feature.getGeometry().getCoordinates());
         }
         else {
             map.beforeRender(ol.animation.zoom({
@@ -218,13 +204,13 @@ $("#search").autocomplete({
                 duration: 500,
                 source: view.getCenter()
             }));
-            view.fitExtent(found.feature.getGeometry().getExtent(), map.getSize());
+            view.fitExtent(feature.getGeometry().getExtent(), map.getSize());
         }
 
-        $("#result").html(result_template(found));
+        $("#result").html(result_template(result.item.item));
         $("#result").addClass('selected');
     }
-}).data( "ui-autocomplete" )._renderItem = function( ul, item ) {
+}).data("ui-autocomplete")._renderItem = function(ul, item) {
     return $("<li>")
         .append("<a>" + item.label + "</a>")
         .appendTo(ul);
@@ -256,7 +242,7 @@ $("#geolocation").click(function(event) {
 var deviceOrientation = new ol.DeviceOrientation();
 //deviceOrientation.bindTo('alpha', map, 'rotation');
 deviceOrientation.on('propertychange', function(event) {
-    if (event.getKey() == ol.DeviceOrientationProperty.HEADING) {
+    if (event.key == ol.DeviceOrientationProperty.HEADING) {
         view.setRotation(
             deviceOrientation.get(ol.DeviceOrientationProperty.HEADING)
         );
@@ -288,10 +274,10 @@ goog.events.listen(goog.global.document, goog.dom.fullscreen.EventType.CHANGE,
     }, false, this
 );
 $("#fullscreen").click(function(event) {
+    event.preventDefault();
     if (!goog.dom.fullscreen.isSupported()) {
         return;
     }
-    event.preventDefault();
     if (goog.dom.fullscreen.isFullScreen()) {
         goog.dom.fullscreen.exitFullScreen();
     }

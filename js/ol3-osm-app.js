@@ -20,10 +20,27 @@ var layers = {
             }), ol.source.OSM.DATA_ATTRIBUTION]
         })
     }),
-    "MapQuest ouverte": new ol.layer.Tile({
+    "MapQuest osm": new ol.layer.Tile({
         visible: false,
         preload: Infinity,
-        source: new ol.source.MapQuestOSM()
+        source: new ol.source.MapQuest({layer: 'osm'})
+    }),
+    "MapQuest ortho": new ol.layer.Tile({
+        visible: false,
+        preload: Infinity,
+        source: new ol.source.MapQuest({layer: 'sat'})
+    }),
+    "MapQuest hybride": new ol.layer.Group({
+        style: 'AerialWithLabels',
+        visible: false,
+        layers: [
+            new ol.layer.Tile({
+                source: new ol.source.MapQuest({layer: 'sat'})
+            }),
+            new ol.layer.Tile({
+                source: new ol.source.MapQuest({layer: 'hyb'})
+            })
+        ]
     }),
     "MapBox": new ol.layer.Tile({
         visible: false,

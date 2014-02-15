@@ -219,6 +219,24 @@ $("#result").click(function (event) {
     $("#result").removeClass('selected');
 });
 
+var icon = new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+    anchor: [0.5, 1],
+    anchorXUnits: 'fraction',
+    anchorYUnits: 'fraction',
+    size: [52, 74],
+    src: "image/location74.png"
+}));
+icon.load();
+this.positionOverlay = new ol.FeatureOverlay({
+    map: map,
+    style: function() {
+        return [new ol.style.Style({
+            image: icon
+        })];
+    }
+});
+var routingGeolocation = new ol.Geolocation();
+routingGeolocation.setProjection(view.getProjection());
 var geolocation = new ol.Geolocation();
 geolocation.setProjection(view.getProjection());
 geolocation.on('change:position', function(event) {
@@ -227,6 +245,9 @@ geolocation.on('change:position', function(event) {
         source: view.getCenter()
     }));
     view.setCenter(geolocation.getPosition());
+    self.positionOverlay.setFeatures(new ol.Collection([
+        new ol.Feature(new ol.geom.Point(geolocation.getPosition()))
+    ]));
 });
 $("#geolocation").click(function(event) {
     event.preventDefault();

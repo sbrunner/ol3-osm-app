@@ -132,11 +132,12 @@ var routingOverlay = new ol.FeatureOverlay({
         return [new ol.style.Style({
             stroke: new ol.style.Stroke({
                 color: 'rgba(0, 100, 255, 0.8)',
-                width: 2
+                width: 6
             })
         })];
     }
 });
+var foundCentroid;
 var foundOverlay = new ol.FeatureOverlay({
     map: map,
     style: function() {
@@ -199,6 +200,7 @@ $("#search").autocomplete({
     select: function(event, result) {
         var feature = result.item.item.feature;
         foundOverlay.setFeatures(new ol.Collection([feature]));
+        foundCentroid = [parseFloat(result.item.item.lon), parseFloat(result.item.item.lat)];
 
         if (feature.getGeometry().getType() == 'Point') {
             map.beforeRender(ol.animation.pan({
@@ -364,8 +366,7 @@ routingGeolocation.on('change:position', function(event) {
     if (calculateRouting) {
         calculateRouting = false;
         pos = ol.proj.transform(pos, 'EPSG:3857', 'EPSG:4326');
-        var flatCoords = foundOverlay.getFeatures().getAt(0).getGeometry().getFlatCoordinates();
-        var start = ol.proj.transform([flatCoords[0], flatCoords[1]], 'EPSG:3857', 'EPSG:4326');
+        var start = foundCentroid;
         request.doRequest(url({
             start_lon: start[0],
             start_lat: start[1],
@@ -377,7 +378,7 @@ routingGeolocation.on('change:position', function(event) {
                 console.log(tmpErrors);
                 var html = "";
                 for (var m = 0; m < tmpErrors.length; m++) {
-                    html.append("<div class='error'>" + tmpErrors[m].message + "</div>");
+                    html += "<div class='error'>" + tmpErrors[m].message + "</div>";
                 }
                 $("#routing-instructions").html(html);
                 $("#routing-instructions").addClass('selected');
@@ -388,9 +389,12 @@ routingGeolocation.on('change:position', function(event) {
                 return;
             }
 
-            routingOverlay.setFeatures(new ol.Collection([new ol.Feature(
-                geojsonformat.readGeometry(json.route.data)
-            )]));
+            var geom = geojsonformat.readGeometry(json.route.data);
+            geom.setFlatCoordinates(
+                ol.geom.GeometryLayout.XY,
+                ol.proj.transform(geom.getFlatCoordinates(), 'EPSG:4326', 'EPSG:3857')
+            );
+            routingOverlay.setFeatures(new ol.Collection([new ol.Feature(geom)]));
 
             var indi = json.route.instructions.indications[0];
             if (indi == -3)
@@ -421,7 +425,7 @@ routingGeolocation.on('change:position', function(event) {
 });
 $("#routing").click(function(event) {
     event.preventDefault();
-    if (foundOverlay.getFeatures().getLength() == 1) {
+    if (foundCentroid) {
         // desable geolocation
         geolocation.setTracking(false);
         $("#geolocation").removeClass('selected');

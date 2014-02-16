@@ -477,7 +477,7 @@ function showRoute(pos) {
             instructions.coords[instructionNumber][0] - 50,
             instructions.coords[instructionNumber][1] - 50,
             instructions.coords[instructionNumber][0] + 50,
-            instructions.coords[instructionNumber][1] + 50,
+            instructions.coords[instructionNumber][1] + 50
         ]));
         nextInstructionOverlay1.setFeatures(nextFeatures);
         nextInstructionOverlay2.setFeatures(nextFeatures);

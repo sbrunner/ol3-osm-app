@@ -127,14 +127,14 @@ $("#zoom-out").click(function(event) {
 });
 
 var routingSource = new ol.source.Vector({
-    proejection: 'EPSG:3857'
+    projection: 'EPSG:3857'
 });
 var routingOverlay = new ol.FeatureOverlay({
     map: map,
     style: function() {
         return [new ol.style.Style({
             stroke: new ol.style.Stroke({
-                color: 'rgba(0, 100, 255, 0.8)',
+                color: [0, 100, 255, 0.8],
                 width: 6
             })
         })];
@@ -163,22 +163,30 @@ var instructionsOverlay = new ol.FeatureOverlay({
             image: new ol.style.Circle({
                 radius: 5,
                 fill: new ol.style.Fill({
-                    color: 'rgba(0, 100, 255, 0.8)'
+                    color: [0, 100, 255, 0.8]
                 })
             })
         })];
     }
 });
-var nextInstructionOverlay = new ol.FeatureOverlay({
+var nextInstructionOverlay1 = new ol.FeatureOverlay({
     map: map,
     style: function() {
         return [new ol.style.Style({
-            image: new ol.style.Circle({
-                radius: 7,
-                stroke: new ol.style.Stroke({
-                    color: 'rgba(0, 255, 255, 0.8)',
-                    width: 3
-                })
+            stroke: new ol.style.Stroke({
+                color: [0, 0, 0, 0.6],
+                width: 14
+            })
+        })];
+    }
+});
+var nextInstructionOverlay2 = new ol.FeatureOverlay({
+    map: map,
+    style: function() {
+        return [new ol.style.Style({
+            stroke: new ol.style.Stroke({
+                color: [255, 255, 255, 1],
+                width: 12
             })
         })];
     }
@@ -189,17 +197,17 @@ var foundOverlay = new ol.FeatureOverlay({
     style: function() {
         return [new ol.style.Style({
             stroke: new ol.style.Stroke({
-                color: 'rgba(255, 100, 0, 0.4)',
+                color: [255, 100, 0, 0.4],
                 width: 2
             }),
             fill: new ol.style.Fill({
-                color: 'rgba(255, 100, 0, 0.2)'
+                color: [255, 100, 0, 0.2]
             }),
             image: new ol.style.Circle({
                 radius: 8,
-                fill: new ol.style.Stroke({color: 'rgba(255, 100, 0, 0.2)'}),
+                fill: new ol.style.Stroke({color: [255, 100, 0, 0.2]}),
                 stroke: new ol.style.Stroke({
-                    color: 'rgba(255, 100, 0, 0.8)',
+                    color: [255, 100, 0, 0.8],
                     width: 1
                 })
             })
@@ -397,10 +405,58 @@ var url = Handlebars.compile('http://graphhopper.com/routing/api/route?point={{e
 var request = new GHRequest('graphhopper.com');
 var calculateRouting = true;
 var instructions;
-function showRoute(geom, instruction, dist) {
-    routingOverlay.setFeatures(new ol.Collection([new ol.Feature(geom)]));
+var route;
+function showRoute(pos) {
+    var closestFeature = routingSource.getClosestFeatureToCoordinate(pos);
+    if (!closestFeature) {
+        return;
+    }
+    var closestGeometry = closestFeature.getGeometry();
+    var closestPoint = closestGeometry.getClosestPoint(pos);
+    var routingSegment = [pos, closestPoint, closestGeometry.getCoordinates()[1]];
+    var coordinates = route.getCoordinates();
+    var indexStart = -1;
+    var instructionNumber = -1;
+    var length;
+    for (var i = 0 ; i < coordinates.length ; i++ ) {
+        var dist;
+        if (indexStart != -1) {
+            routingSegment.push(coordinates[i]);
+            if (instructionNumber == -1) {
+                for (var j = 1 ; j < instructions.coords.length ; j++ ) {
+                    dist = ol.coordinate.squaredDistance(
+                        instructions.segments[j].getGeometry().getCoordinates()[0], coordinates[i]
+                    );
+                    if (dist < 1) {
+                        routingSegment.push(instructions.coords[j]);
+                        instructionNumber = j;
+                        length = new ol.geom.LineString(routingSegment).getLength();
+                    }
+                }
+            }
+        }
+        dist = ol.coordinate.squaredDistance(
+            closestGeometry.getCoordinates()[1], coordinates[i]
+        );
+        if (dist < 1) {
+            indexStart = i;
+        }
+    }
 
-    var indi = instructions.indications[instruction];
+    var nextFeatures = new ol.Collection(routingSource.getAllFeaturesInExtent([
+        instructions.coords[instructionNumber][0] - 50,
+        instructions.coords[instructionNumber][1] - 50,
+        instructions.coords[instructionNumber][0] + 50,
+        instructions.coords[instructionNumber][1] + 50,
+    ]));
+    nextInstructionOverlay1.setFeatures(nextFeatures);
+    nextInstructionOverlay2.setFeatures(nextFeatures);
+
+    routingOverlay.setFeatures(new ol.Collection([new ol.Feature(
+        new ol.geom.LineString(routingSegment)
+    )]));
+
+    var indi = instructions.indications[instructionNumber];
     if (indi == -3)
         indi = "sharp_left";
     else if (indi == -2)
@@ -420,8 +476,8 @@ function showRoute(geom, instruction, dist) {
 
     $("#routing-instructions").html(routing_template({
         icon: indi,
-        dist: Math.round(dist),
-        instruction: instructions.descriptions[instruction]
+        dist: Math.round(length),
+        instruction: instructions.descriptions[instructionNumber]
     }));
     $("#routing-instructions").addClass('selected');
 }
@@ -440,13 +496,13 @@ routingGeolocation.on('change:position', function(event) {
 
     if (calculateRouting) {
         calculateRouting = false;
-        pos = ol.proj.transform(pos, 'EPSG:3857', 'EPSG:4326');
+        ll_pos = ol.proj.transform(pos, 'EPSG:3857', 'EPSG:4326');
         var start = foundCentroid;
         request.doRequest(url({
             start_lon: start[0],
             start_lat: start[1],
-            end_lon: pos[0],
-            end_lat: pos[1]
+            end_lon: ll_pos[0],
+            end_lat: ll_pos[1]
         }), function(json) {
             if (json.info.errors) {
                 var tmpErrors = json.info.errors;
@@ -465,33 +521,23 @@ routingGeolocation.on('change:position', function(event) {
             }
 
             instructions = json.route.instructions;
-            var geom = geojsonformat.readGeometry(json.route.data);
-            geom.setFlatCoordinates(
+            route = geojsonformat.readGeometry(json.route.data);
+            route.setFlatCoordinates(
                 ol.geom.GeometryLayout.XY,
-                ol.proj.transform(geom.getFlatCoordinates(), 'EPSG:4326', 'EPSG:3857')
+                ol.proj.transform(route.getFlatCoordinates(), 'EPSG:4326', 'EPSG:3857')
             );
             destinationOverlay.setFeatures(new ol.Collection([new ol.Feature(
                 new ol.geom.Point(ol.proj.transform(foundCentroid, 'EPSG:4326', 'EPSG:3857'))
             )]));
-            var ll = instructions.latLngs[1];
+/*            var ll = instructions.latLngs[1];
             nextInstructionOverlay.setFeatures(new ol.Collection([new ol.Feature(
                 new ol.geom.Point(ol.proj.transform(
                     [ll[1], ll[0]], 'EPSG:4326', 'EPSG:3857'
                 ))
-            )]));
+            )]));*/
             instructionsOverlay.setFeatures(new ol.Collection());
-            instructions.coords = [];
-            for (var i = 0 ; i < instructions.latLngs.length ; i++) {
-                ll = instructions.latLngs[i];
-                instructions.coords[i] = ol.proj.transform(
-                    [ll[1], ll[0]], 'EPSG:4326', 'EPSG:3857'
-                );
-                instructionsOverlay.addFeature(new ol.Feature(
-                    new ol.geom.Point(instructions.coords[i])
-                ));
-            }
-            var routingSegments = new ol.Collection();
-            var coordinates = geom.getCoordinates();
+            var routingSegments = [];
+            var coordinates = route.getCoordinates();
             for (var j = 1 ; j < coordinates.length ; j++) {
                 routingSegments.push(new ol.Feature(new ol.geom.LineString(
                     [coordinates[j-1], coordinates[j]]
@@ -500,43 +546,24 @@ routingGeolocation.on('change:position', function(event) {
             routingSource.clear();
             routingSource.addFeatures(routingSegments);
 
-            showRoute(geom, 1, instructions.distances[0]);
+            instructions.coords = [];
+            instructions.segments = [];
+            for (var i = 0 ; i < instructions.latLngs.length ; i++) {
+                ll = instructions.latLngs[i];
+                instructions.coords[i] = ol.proj.transform(
+                    [ll[1], ll[0]], 'EPSG:4326', 'EPSG:3857'
+                );
+                instructions.segments[i] = routingSource.getClosestFeatureToCoordinate(instructions.coords[i]);
+
+                instructionsOverlay.addFeature(new ol.Feature(
+                    new ol.geom.Point(instructions.coords[i])
+                ));
+            }
+
+            showRoute(pos);
         });
     } else {
-        var closestFeature = routingSource.getClosestFeatureToCoordinate(pos);
-        var closestGeometry = closestFeature.getGeometry();
-        var closestPoint = geometry.getClosestPoint(coordinate);
-        var routingSegment = new ol.Collection([pos, closestPoint, closestGeometry.getCoordinates()[1]]);
-        var coordinates = routingOverlay.getFeatures()[0].getGeometry().getCoordinates();
-        var indexStart = -1;
-        var indexInstruction = -1;
-        var instructionNumber = -1;
-        var length;
-        for (var i = 0 ; i < coordinates.length ; i ++ ) {
-            var dist;
-            if (indexStart != -1) {
-                routingSegment.push(coordinate[i]);
-                if (indexInstruction == -1) {
-                    for (var j = 0 ; j < instructions.lenth ; j++ ) {
-                        dist = ol.coordinate.squaredDistance(
-                            instructions.coords[j], coordinate[i]
-                        );
-                        if (dist < 1) {
-                            indexInstruction = i;
-                            instructionNumber = j;
-                            length = new ol.geom.LineString(routingSegment).getLength();
-                        }
-                    }
-                }
-            }
-            dist = ol.coordinate.squaredDistance(
-                closestGeometry.getCoordinates()[1], coordinate[i]
-            );
-            if (dist < 1) {
-                indexStart = i;
-            }
-        }
-        showRoute(new ol.geom.LineString(routingSegment), instructionNumber, length);
+        showRoute(pos);
     }
 });
 $("#routing").click(function(event) {

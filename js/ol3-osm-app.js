@@ -467,8 +467,12 @@ function showRoute(pos) {
     if (dist > lessSquaredDist) {
         $("#routing-instructions").removeClass('selected');
         routingGeolocation.setTracking(false);
+        view.setRotation(0);
     }
     else {
+        var sc = closestGeometry.getCoordinates();
+        view.setRotation(-Math.atan2(sc[1][0] - sc[0][0], sc[1][1] - sc[0][1]));
+
         var nextFeatures = new ol.Collection(routingSource.getAllFeaturesInExtent([
             instructions.coords[instructionNumber][0] - 50,
             instructions.coords[instructionNumber][1] - 50,

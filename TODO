@@ -1,10 +1,11 @@
 Routing:
   - reroute when it's nessesery
   - end routing on destination reatch
-  - use only one geolocation service
-  - close the keyword on search ends
+  - use storage to remember context
+  - close the keyboard on search ends
   - adapt zoom on speed and next instruction
   - orientaton using the road direction
+  - use only one geolocation service
   - Routing in black background
   - service supportant les rounds points ?
   - try: chrome.tts.speak('Hello, world!'); or chrome.tts.speak('Hello, world.', {'lang': 'en-US', 'rate': 2.0}); or https://github.com/kripken/speak.js

@@ -303,9 +303,20 @@ positionOverlay = new ol.FeatureOverlay({
         })];
     }
 });
-var routingGeolocation = new ol.Geolocation();
+var routingGeolocation = new ol.Geolocation({
+    trackingOptions: {
+        enableHighAccuracy: true,
+        maximumAge: 30000,
+        timeout: 27000
+    }
+});
 routingGeolocation.setProjection(view.getProjection());
-var geolocation = new ol.Geolocation();
+var geolocation = new ol.Geolocation({
+    trackingOptions: {
+        maximumAge: 30000,
+        timeout: 27000
+    }
+});
 geolocation.setProjection(view.getProjection());
 geolocation.on('change:position', function(event) {
     map.beforeRender(ol.animation.pan({

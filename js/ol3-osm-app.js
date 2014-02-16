@@ -220,6 +220,8 @@ var result_template = Handlebars.compile($('#result-template').html());
 var search_template = Handlebars.compile($('#search-template').html());
 var routing_template = Handlebars.compile($('#routing-template').html());
 $("#search").autocomplete({
+    autoFocus: true,
+    delay: 150,
     source: function(request, responce) {
         var extent = view.calculateExtent(map.getSize());
         extent = ol.extent.transform(extent, ol.proj.getTransform('EPSG:3857', 'EPSG:4326'));
@@ -277,6 +279,7 @@ $("#search").autocomplete({
 
         $("#result").html(result_template(result.item.item));
         $("#result").addClass('selected');
+        document.getElementById("routing").focus();
     }
 }).data("ui-autocomplete")._renderItem = function(ul, item) {
     return $("<li>")

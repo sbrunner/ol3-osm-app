@@ -1,6 +1,5 @@
 Routing:
   - use storage to remember context
-  - close the keyboard on search ends
   - adapt zoom on speed and next instruction
   - orientaton using the road direction
   - use only one geolocation service

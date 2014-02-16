@@ -1,10 +1,10 @@
 Routing:
-  - follow without call the service
   - reroute when it's nessesery
   - end routing on destination reatch
   - adapt zoom on speed and next instruction
-  - orientaton using the road dirrection
+  - orientaton using the road direction
   - Routing in black background
+  - try: chrome.tts.speak('Hello, world!'); or chrome.tts.speak('Hello, world.', {'lang': 'en-US', 'rate': 2.0}); or https://github.com/kripken/speak.js
 - orientation changes to many times
 - webapp
 - firfox os app

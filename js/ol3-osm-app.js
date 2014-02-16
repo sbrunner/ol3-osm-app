@@ -156,19 +156,6 @@ var destinationOverlay = new ol.FeatureOverlay({
         })];
     }
 });
-var instructionsOverlay = new ol.FeatureOverlay({
-    map: map,
-    style: function() {
-        return [new ol.style.Style({
-            image: new ol.style.Circle({
-                radius: 5,
-                fill: new ol.style.Fill({
-                    color: [0, 100, 255, 0.8]
-                })
-            })
-        })];
-    }
-});
 var nextInstructionOverlay1 = new ol.FeatureOverlay({
     map: map,
     style: function() {
@@ -187,6 +174,19 @@ var nextInstructionOverlay2 = new ol.FeatureOverlay({
             stroke: new ol.style.Stroke({
                 color: [255, 255, 255, 1],
                 width: 12
+            })
+        })];
+    }
+});
+var instructionsOverlay = new ol.FeatureOverlay({
+    map: map,
+    style: function() {
+        return [new ol.style.Style({
+            image: new ol.style.Circle({
+                radius: 4,
+                fill: new ol.style.Fill({
+                    color: [0, 0, 140, 0.4]
+                })
             })
         })];
     }

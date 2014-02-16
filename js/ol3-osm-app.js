@@ -417,6 +417,7 @@ var request = new GHRequest('graphhopper.com');
 var calculateRouting = true;
 var instructions;
 var route;
+var lessSquaredDist;
 function showRoute(pos) {
     var closestFeature = routingSource.getClosestFeatureToCoordinate(pos);
     if (!closestFeature) {
@@ -425,12 +426,16 @@ function showRoute(pos) {
     var closestGeometry = closestFeature.getGeometry();
     var closestPoint = closestGeometry.getClosestPoint(pos);
     var routingSegment = [pos, closestPoint, closestGeometry.getCoordinates()[1]];
+    var dist = ol.coordinate.squaredDistance(pos, closestPoint);
+    var lessSquaredDist = Math.min(50, lessSquaredDist, dist);
+    if (dist > 2 * lessSquaredDist) {
+        calculateRouting = true;
+    }
     var coordinates = route.getCoordinates();
     var indexStart = -1;
     var instructionNumber = -1;
     var length;
     for (var i = 0 ; i < coordinates.length ; i++ ) {
-        var dist;
         if (indexStart != -1) {
             routingSegment.push(coordinates[i]);
             if (instructionNumber == -1) {
@@ -507,6 +512,7 @@ routingGeolocation.on('change:position', function(event) {
 
     if (calculateRouting) {
         calculateRouting = false;
+        lessSquaredDist = +Infinity;
         ll_pos = ol.proj.transform(pos, 'EPSG:3857', 'EPSG:4326');
         var start = foundCentroid;
         request.doRequest(url({
@@ -540,12 +546,6 @@ routingGeolocation.on('change:position', function(event) {
             destinationOverlay.setFeatures(new ol.Collection([new ol.Feature(
                 new ol.geom.Point(ol.proj.transform(foundCentroid, 'EPSG:4326', 'EPSG:3857'))
             )]));
-/*            var ll = instructions.latLngs[1];
-            nextInstructionOverlay.setFeatures(new ol.Collection([new ol.Feature(
-                new ol.geom.Point(ol.proj.transform(
-                    [ll[1], ll[0]], 'EPSG:4326', 'EPSG:3857'
-                ))
-            )]));*/
             instructionsOverlay.setFeatures(new ol.Collection());
             var routingSegments = [];
             var coordinates = route.getCoordinates();
@@ -588,6 +588,7 @@ $("#routing").click(function(event) {
         // enhable routing geolocation
         routingGeolocation.setTracking(!routingGeolocation.getTracking());
         if (routingGeolocation.getTracking()) {
+            calculateRouting = true;
             $(event.target).addClass('selected');
         }
         else {

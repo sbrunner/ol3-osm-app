@@ -1,5 +1,4 @@
 Routing:
-  - reroute when it's nessesery
   - end routing on destination reatch
   - use storage to remember context
   - close the keyboard on search ends

@@ -458,44 +458,50 @@ function showRoute(pos) {
             indexStart = i;
         }
     }
+    var routeGeom = new ol.geom.LineString(routingSegment);
+    dist = routeGeom.getLength();
 
-    var nextFeatures = new ol.Collection(routingSource.getAllFeaturesInExtent([
-        instructions.coords[instructionNumber][0] - 50,
-        instructions.coords[instructionNumber][1] - 50,
-        instructions.coords[instructionNumber][0] + 50,
-        instructions.coords[instructionNumber][1] + 50,
-    ]));
-    nextInstructionOverlay1.setFeatures(nextFeatures);
-    nextInstructionOverlay2.setFeatures(nextFeatures);
+    if (dist > lessSquaredDist) {
+        $("#routing-instructions").removeClass('selected');
+        routingGeolocation.setTracking(false);
+    }
+    else {
+        var nextFeatures = new ol.Collection(routingSource.getAllFeaturesInExtent([
+            instructions.coords[instructionNumber][0] - 50,
+            instructions.coords[instructionNumber][1] - 50,
+            instructions.coords[instructionNumber][0] + 50,
+            instructions.coords[instructionNumber][1] + 50,
+        ]));
+        nextInstructionOverlay1.setFeatures(nextFeatures);
+        nextInstructionOverlay2.setFeatures(nextFeatures);
 
-    routingOverlay.setFeatures(new ol.Collection([new ol.Feature(
-        new ol.geom.LineString(routingSegment)
-    )]));
+        routingOverlay.setFeatures(new ol.Collection([new ol.Feature(routeGeom)]));
 
-    var indi = instructions.indications[instructionNumber];
-    if (indi == -3)
-        indi = "sharp_left";
-    else if (indi == -2)
-        indi = "left";
-    else if (indi == -1)
-        indi = "slight_left";
-    else if (indi === 0)
-        indi = "continue";
-    else if (indi == 1)
-        indi = "slight_right";
-    else if (indi == 2)
-        indi = "right";
-    else if (indi == 3)
-        indi = "sharp_right";
-    else if (indi == 4)
-        indi = "marker-to";
+        var indi = instructions.indications[instructionNumber];
+        if (indi == -3)
+            indi = "sharp_left";
+        else if (indi == -2)
+            indi = "left";
+        else if (indi == -1)
+            indi = "slight_left";
+        else if (indi === 0)
+            indi = "continue";
+        else if (indi == 1)
+            indi = "slight_right";
+        else if (indi == 2)
+            indi = "right";
+        else if (indi == 3)
+            indi = "sharp_right";
+        else if (indi == 4)
+            indi = "marker-to";
 
-    $("#routing-instructions").html(routing_template({
-        icon: indi,
-        dist: Math.round(length),
-        instruction: instructions.descriptions[instructionNumber]
-    }));
-    $("#routing-instructions").addClass('selected');
+        $("#routing-instructions").html(routing_template({
+            icon: indi,
+            dist: Math.round(length),
+            instruction: instructions.descriptions[instructionNumber]
+        }));
+        $("#routing-instructions").addClass('selected');
+    }
 }
 routingGeolocation.on('change:position', function(event) {
     if (view.getCenter()) {

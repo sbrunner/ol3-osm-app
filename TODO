@@ -1,5 +1,4 @@
 Routing:
-  - end routing on destination reatch
   - use storage to remember context
   - close the keyboard on search ends
   - adapt zoom on speed and next instruction

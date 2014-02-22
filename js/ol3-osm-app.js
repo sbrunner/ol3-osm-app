@@ -347,14 +347,14 @@ var routingGeolocation = new ol.Geolocation({
     trackingOptions: {
         enableHighAccuracy: true,
         maximumAge: 30000,
-        timeout: 27000
+        timeout: 5000
     }
 });
 routingGeolocation.setProjection(view.getProjection());
 var geolocation = new ol.Geolocation({
     trackingOptions: {
         maximumAge: 30000,
-        timeout: 27000
+        timeout: 30000
     }
 });
 geolocation.setProjection(view.getProjection());

@@ -1,12 +1,24 @@
 Routing:
-  - use storage to remember context
-  - adapt zoom on speed and next instruction
-  - use only one geolocation service
+  - Use storage to remember context
+  - Use Bootstrap css
+    - http://getbootstrap.com/components/#input-groups-basic
+    - http://getbootstrap.com/components/#list-group-linked
+    - http://sitediscount.ru/classic_bl_inverted_theme/index.html
+  - Lower geolocation timeout
+  - Remove zoom constrains
+  - Adapt zoom on next instruction (Zoom to booth point)
+  - Service supportant les rounds points ? http://map.project-osrm.org/ 
   - Routing in black background
-  - service supportant les rounds points ?
-  - try: chrome.tts.speak('Hello, world!'); or chrome.tts.speak('Hello, world.', {'lang': 'en-US', 'rate': 2.0}); or https://github.com/kripken/speak.js
+  - Merge geom in multi geometry, add arrow
+  - Animation on orientation change
+  - try: chrome.tts.speak('Hello, world.', {'lang': 'fr_FR', 'rate': 2.0});
 - orientation changes to many times
 - webapp
 - firfox os app
 - chome app
 - ios webapp ?
+- Code structure (with Ember ?)
+
+Missing in OpenLayers
+- Zoom a geometry to a screen extent (include margin and rotation)
+- Set a point at a screen position

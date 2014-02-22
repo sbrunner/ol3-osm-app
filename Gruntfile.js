@@ -38,7 +38,7 @@ module.exports = function(grunt) {
         cssmin: {
             "ol3-osm-app": {
                 files: {
-                    'build/ol3-osm-app.css': ['css/jquery-ui-1.10.3.custom.min.css', 'css/ol.css', 'css/ol3-osm-app.css']
+                    'build/ol3-osm-app.css': ['css/font-awesome.css', 'css/jquery-ui-1.10.3.custom.min.css', 'css/ol.css', 'css/bootstrap.css', 'css/ol3-osm-app.css']
                 }
             }
         },
